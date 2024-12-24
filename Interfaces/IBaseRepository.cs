@@ -17,5 +17,6 @@ namespace E_LearningPlatform.Interfaces
         int Count();
         int Count(Expression<Func<T, bool>> predicate);
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip);
+        int SaveChanges();
     }
 }

@@ -106,5 +106,10 @@ namespace E_LearningPlatform.Repositories
 
             return query.ToList();
         }
+
+        public int SaveChanges()
+        {
+            return _context.SaveChanges();
+        }
     }
 }
