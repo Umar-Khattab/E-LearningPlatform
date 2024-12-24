@@ -18,13 +18,13 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
+        public ActionResult<IEnumerable<Question>> GetQuestions()
         {
             return Ok(_repository.GetAll());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Question>> GetQuestion(int id)
+        public ActionResult<Question> GetQuestion(int id)
         {
             var question = _repository.Find(q => q.QuestionId == id);
             if (question == null)
@@ -35,14 +35,15 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Question>> PostQuestion(Question question)
+        public ActionResult<Question> PostQuestion(Question question)
         {
             _repository.Add(question);
+            _repository.SaveChanges();
             return CreatedAtAction(nameof(GetQuestion), new { id = question.QuestionId }, question);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutQuestion(int id, Question question)
+        public IActionResult PutQuestion(int id, Question question)
         {
             if (id != question.QuestionId)
             {
@@ -50,11 +51,12 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Update(question);
+            _repository.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteQuestion(int id)
+        public IActionResult DeleteQuestion(int id)
         {
             var question = _repository.Find(q => q.QuestionId == id);
             if (question == null)
@@ -63,6 +65,7 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Delete(question);
+            _repository.SaveChanges();
             return NoContent();
         }
     }

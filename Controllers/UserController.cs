@@ -18,13 +18,13 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public  ActionResult<IEnumerable<User>> GetUsers()
         {
             return Ok(_repository.GetAll());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public ActionResult<User> GetUser(int id)
         {
             var user = _repository.Find(u => u.UserId == id);
             if (user == null)
@@ -35,14 +35,15 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public ActionResult<User> PostUser(User user)
         {
             _repository.Add(user);
+            _repository.SaveChanges();
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public IActionResult PutUser(int id, User user)
         {
             if (id != user.UserId)
             {
@@ -50,11 +51,12 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Update(user);
+            _repository.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public IActionResult DeleteUser(int id)
         {
             var user = _repository.Find(u => u.UserId == id);
             if (user == null)
@@ -63,6 +65,7 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Delete(user);
+            _repository.SaveChanges();
             return NoContent();
         }
     }

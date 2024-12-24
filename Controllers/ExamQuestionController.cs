@@ -18,13 +18,13 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ExamsQuestion>>> GetExamsQuestions()
+        public ActionResult<IEnumerable<ExamsQuestion>> GetExamsQuestions()
         {
             return Ok(_repository.GetAll());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExamsQuestion>> GetExamsQuestion(int id)
+        public ActionResult<ExamsQuestion> GetExamsQuestion(int id)
         {
             var examsQuestion = _repository.Find(eq => eq.Id == id);
             if (examsQuestion == null)
@@ -35,14 +35,15 @@ namespace E_LearningPlatform.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ExamsQuestion>> PostExamsQuestion(ExamsQuestion examsQuestion)
+        public ActionResult<ExamsQuestion> PostExamsQuestion(ExamsQuestion examsQuestion)
         {
             _repository.Add(examsQuestion);
+            _repository.SaveChanges();
             return CreatedAtAction(nameof(GetExamsQuestion), new { id = examsQuestion.Id }, examsQuestion);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutExamsQuestion(int id, ExamsQuestion examsQuestion)
+        public IActionResult PutExamsQuestion(int id, ExamsQuestion examsQuestion)
         {
             if (id != examsQuestion.Id)
             {
@@ -50,11 +51,12 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Update(examsQuestion);
+            _repository.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteExamsQuestion(int id)
+        public IActionResult DeleteExamsQuestion(int id)
         {
             var examsQuestion = _repository.Find(eq => eq.Id == id);
             if (examsQuestion == null)
@@ -63,6 +65,7 @@ namespace E_LearningPlatform.Controllers
             }
 
             _repository.Delete(examsQuestion);
+            _repository.SaveChanges();
             return NoContent();
         }
     }
