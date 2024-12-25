@@ -1,4 +1,5 @@
-﻿using E_LearningPlatform.Models;
+﻿using E_LearningPlatform.Interfaces;
+using E_LearningPlatform.Models;
 using E_LearningPlatform.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,9 +11,9 @@ namespace E_LearningPlatform.Controllers
     [ApiController]
     public class ExamController : ControllerBase
     {
-        private readonly BaseRepository<Exam> _repository;
+        private readonly IBaseRepository<Exam> _repository;
 
-        public ExamController(BaseRepository<Exam> repository)
+        public ExamController(IBaseRepository<Exam> repository)
         {
             _repository = repository;
         }
