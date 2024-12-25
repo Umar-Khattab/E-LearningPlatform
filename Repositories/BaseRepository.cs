@@ -1,115 +1,186 @@
 ﻿using E_LearningPlatform.Interfaces;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using E_LearningPlatform.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace E_LearningPlatform.Repositories
 {
-    /// <summary>
-    /// A base repository class that provides common data access methods for entities.
-    /// </summary>
-    /// <typeparam name="T">The type of the entity.</typeparam>
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         private readonly AppDBContext _context;
+        private readonly ILogger<BaseRepository<T>> _logger;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseRepository{T}"/> class.
-        /// </summary>
-        /// <param name="context">The database context.</param>
-        public BaseRepository(AppDBContext context)
+        public BaseRepository(AppDBContext context, ILogger<BaseRepository<T>> logger)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Adds a new entity to the database.
-        /// </summary>
-        /// <param name="entity">The entity to add.</param>
-        /// <returns>The added entity.</returns>
         public T Add(T entity)
         {
-            _context.Set<T>().Add(entity);
-            return entity;
+            try
+            {
+                if (entity == null)
+                    throw new ArgumentNullException(nameof(entity));
+
+                _logger.LogInformation($"Adding new {typeof(T).Name}");
+                _context.Set<T>().Add(entity);
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error adding {typeof(T).Name}");
+                throw new RepositoryException($"Error adding {typeof(T).Name}", ex);
+            }
         }
 
-        /// <summary>
-        /// Deletes an entity from the database.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
-        public void Delete(T entity) => _context.Set<T>().Remove(entity);
+        public void Delete(T entity)
+        {
+            try
+            {
+                if (entity == null)
+                    throw new ArgumentNullException(nameof(entity));
 
-        /// <summary>
-        /// Finds an entity that matches the specified predicate.
-        /// </summary>
-        /// <param name="predicate">The predicate to match.</param>
-        /// <returns>The entity that matches the predicate, or throws an exception if no entity is found.</returns>
-        /// <exception cref="Exception">Thrown when no entity is found that matches the predicate.</exception>
-        public T Find(Expression<Func<T, bool>> predicate) => _context.Set<T>().Where(predicate).FirstOrDefault() ?? throw new Exception($"Entity of type {typeof(T).Name} not found.");
+                _logger.LogInformation($"Deleting {typeof(T).Name}");
+                _context.Set<T>().Remove(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting {typeof(T).Name}");
+                throw new RepositoryException($"Error deleting {typeof(T).Name}", ex);
+            }
+        }
 
-        /// <summary>
-        /// Gets all entities from the database.
-        /// </summary>
-        /// <returns>An enumerable collection of entities.</returns>
+        public T Find(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                _logger.LogInformation($"Finding {typeof(T).Name} by predicate");
+                var entity = _context.Set<T>().FirstOrDefault(predicate);
+
+                if (entity == null)
+                    throw new NotFoundException($"{typeof(T).Name} not found");
+
+                return entity;
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error finding {typeof(T).Name}");
+                throw new RepositoryException($"Error finding {typeof(T).Name}", ex);
+            }
+        }
+
         public IEnumerable<T> GetAll()
         {
-            return _context.Set<T>().ToList();
+            try
+            {
+                _logger.LogInformation($"Getting all {typeof(T).Name} entities");
+                return _context.Set<T>().AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting all {typeof(T).Name} entities");
+                throw new RepositoryException($"Error retrieving {typeof(T).Name} list", ex);
+            }
         }
 
-        /// <summary>
-        /// Updates an existing entity in the database.
-        /// </summary>
-        /// <param name="entity">The entity to update.</param>
-        /// <returns>The updated entity.</returns>
         public T Update(T entity)
         {
-            _context.Update(entity);
-            return entity;
+            try
+            {
+                if (entity == null)
+                    throw new ArgumentNullException(nameof(entity));
+
+                _logger.LogInformation($"Updating {typeof(T).Name}");
+                _context.Update(entity);
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating {typeof(T).Name}");
+                throw new RepositoryException($"Error updating {typeof(T).Name}", ex);
+            }
         }
 
-        /// <summary>
-        /// Gets the count of all entities in the database.
-        /// </summary>
-        /// <returns>The count of all entities.</returns>
         public int Count()
         {
-            return _context.Set<T>().Count();
+            try
+            {
+                return _context.Set<T>().Count();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error counting {typeof(T).Name} entities");
+                throw new RepositoryException($"Error counting {typeof(T).Name} entities", ex);
+            }
         }
 
-        /// <summary>
-        /// Gets the count of entities that match the specified criteria.
-        /// </summary>
-        /// <param name="criteria">The criteria to match.</param>
-        /// <returns>The count of entities that match the criteria.</returns>
         public int Count(Expression<Func<T, bool>> criteria)
         {
-            return _context.Set<T>().Count(criteria);
+            try
+            {
+                return _context.Set<T>().Count(criteria);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error counting {typeof(T).Name} entities with criteria");
+                throw new RepositoryException($"Error counting {typeof(T).Name} entities", ex);
+            }
         }
 
-        /// <summary>
-        /// Finds all entities that match the specified criteria, with optional pagination.
-        /// </summary>
-        /// <param name="criteria">The criteria to match.</param>
-        /// <param name="skip">The number of entities to skip.</param>
-        /// <param name="take">The number of entities to take.</param>
-        /// <returns>An enumerable collection of entities that match the criteria.</returns>
         public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? skip, int? take)
         {
-            IQueryable<T> query = _context.Set<T>().Where(criteria);
+            try
+            {
+                IQueryable<T> query = _context.Set<T>().Where(criteria);
 
-            if (skip.HasValue)
-                query = query.Skip(skip.Value);
+                if (skip.HasValue)
+                    query = query.Skip(skip.Value);
 
-            if (take.HasValue)
-                query = query.Take(take.Value);
+                if (take.HasValue)
+                    query = query.Take(take.Value);
 
-            return query.ToList();
+                return query.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error finding {typeof(T).Name} entities with criteria");
+                throw new RepositoryException($"Error finding {typeof(T).Name} entities", ex);
+            }
         }
 
         public int SaveChanges()
         {
-            return _context.SaveChanges();
+            try
+            {
+                return _context.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error occurred");
+                throw new RepositoryException("Error saving changes to database", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving changes");
+                throw new RepositoryException("Error saving changes", ex);
+            }
         }
+    }
+
+    // Custom exceptions
+    public class RepositoryException : Exception
+    {
+        public RepositoryException(string message, Exception innerException = null)
+            : base(message, innerException) { }
+    }
+
+    public class NotFoundException : Exception
+    {
+        public NotFoundException(string message) : base(message) { }
     }
 }
