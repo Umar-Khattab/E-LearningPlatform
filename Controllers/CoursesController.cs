@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace E_LearningPlatform.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class CoursesController : ControllerBase
     {

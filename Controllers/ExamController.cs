@@ -7,16 +7,11 @@ using System.Threading.Tasks;
 
 namespace E_LearningPlatform.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
-    public class ExamController : ControllerBase
+    public class ExamController(IBaseRepository<Exam> repository) : ControllerBase
     {
-        private readonly IBaseRepository<Exam> _repository;
-
-        public ExamController(IBaseRepository<Exam> repository)
-        {
-            _repository = repository;
-        }
+        private readonly IBaseRepository<Exam> _repository = repository;
 
         [HttpGet]
         public ActionResult<IEnumerable<Exam>> GetExams()

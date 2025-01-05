@@ -1,6 +1,15 @@
 @E_LearningPlatform_HostAddress = http://localhost:5143
 
-GET {{E_LearningPlatform_HostAddress}}/weatherforecast/
+GET {{E_LearningPlatform_HostAddress}}/Courses/
 Accept: application/json
 
-###
+POST {{E_LearningPlatform_HostAddress}}/Courses/
+Content-Type: application/json
+Accept: application/json
+{
+  "Name": "Course 1",
+  "Description": "Description of Course 1",
+  "Price": 100.0,
+  "Duration": 10
+}
+
