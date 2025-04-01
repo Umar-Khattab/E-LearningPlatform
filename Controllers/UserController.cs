@@ -13,62 +13,62 @@ namespace E_LearningPlatform.Controllers
     {
         private readonly IBaseRepository<User> _repository;
 
-        public UserController(IBaseRepository<User> repository)
-        {
-            _repository = repository;
-        }
+        //public UserController(IBaseRepository<User> repository)
+        //{
+        //    _repository = repository;
+        //}
 
-        [HttpGet]
-        public  ActionResult<IEnumerable<User>> GetUsers()
-        {
-            return Ok(_repository.GetAll());
-        }
+        //[HttpGet]
+        //public  ActionResult<IEnumerable<User>> GetUsers()
+        //{
+        //    return Ok(_repository.GetAll());
+        //}
 
-        [HttpGet("{id}")]
-        public ActionResult<User> GetUser(int id)
-        {
-            var user = _repository.Find(u => u.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user);
-        }
+        //[HttpGet("{id}")]
+        //public ActionResult<User> GetUser(int id)
+        //{
+        //    var user = _repository.Find(u => u.UserId == id);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(user);
+        //}
 
-        [HttpPost]
-        public ActionResult<User> PostUser(User user)
-        {
-            _repository.Add(user);
-            _repository.SaveChanges();
-            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
-        }
+        //[HttpPost]
+        //public ActionResult<User> PostUser(User user)
+        //{
+        //    _repository.Add(user);
+        //    _repository.SaveChanges();
+        //    return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+        //}
 
-        [HttpPut("{id}")]
-        public IActionResult PutUser(int id, User user)
-        {
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public IActionResult PutUser(int id, User user)
+        //{
+        //    if (id != user.UserId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _repository.Update(user);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Update(user);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
-        {
-            var user = _repository.Find(u => u.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteUser(int id)
+        //{
+        //    var user = _repository.Find(u => u.UserId == id);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _repository.Delete(user);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Delete(user);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
     }
 }
 

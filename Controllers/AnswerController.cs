@@ -13,61 +13,61 @@ namespace E_LearningPlatform.Controllers
     {
         private readonly IBaseRepository<Answer> _repository;
 
-        public AnswerController(IBaseRepository<Answer> repository)
-        {
-            _repository = repository;
-        }
+        //public AnswerController(IBaseRepository<Answer> repository)
+        //{
+        //    _repository = repository;
+        //}
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Answer>> GetAnswers()
-        {
-            return Ok(_repository.GetAll());
-        }
+        //[HttpGet]
+        //public ActionResult<IEnumerable<Answer>> GetAnswers()
+        //{
+        //    return Ok(_repository.GetAll());
+        //}
 
-        [HttpGet("{id}")]
-        public ActionResult<Answer> GetAnswer(int id)
-        {
-            var answer = _repository.Find(a => a.ResultId == id);
-            if (answer == null)
-            {
-                return NotFound();
-            }
-            return Ok(answer);
-        }
+        //[HttpGet("{id}")]
+        //public ActionResult<Answer> GetAnswer(int id)
+        //{
+        //    var answer = _repository.Find(a => a.ID == id);
+        //    if (answer == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(answer);
+        //}
 
-        [HttpPost]
-        public ActionResult<Answer> PostAnswer(Answer answer)
-        {
-            _repository.Add(answer);
-            _repository.SaveChanges();
-            return CreatedAtAction(nameof(GetAnswer), new { id = answer.ResultId }, answer);
-        }
+        //[HttpPost]
+        //public ActionResult<Answer> PostAnswer(Answer answer)
+        //{
+        //    _repository.Add(answer);
+        //    _repository.SaveChanges();
+        //    return CreatedAtAction(nameof(GetAnswer), new { id = answer.ID }, answer);
+        //}
 
-        [HttpPut("{id}")]
-        public IActionResult PutAnswer(int id, Answer answer)
-        {
-            if (id != answer.ResultId)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public IActionResult PutAnswer(int id, Answer answer)
+        //{
+        //    if (id != answer.ID)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _repository.Update(answer);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Update(answer);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteAnswer(int id)
-        {
-            var answer = _repository.Find(a => a.ResultId == id);
-            if (answer == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteAnswer(int id)
+        //{
+        //    var answer = _repository.Find(a => a.ID == id);
+        //    if (answer == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _repository.Delete(answer);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Delete(answer);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
     }
 }

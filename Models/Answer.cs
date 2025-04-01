@@ -1,11 +1,12 @@
-﻿using System;
+﻿using E_LearningPlatform.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace E_LearningPlatform.Models;
 
-public partial class Answer
+public partial class Answer:ISharedProperties
 {
-    public int ResultId { get; set; }
+    public int Id { get; set; }
 
     public int QuestionId { get; set; }
 
@@ -14,6 +15,8 @@ public partial class Answer
     public string StudentAwnser { get; set; } = null!;
 
     public int ExamId { get; set; }
+
+    public bool IsDeleted { get; set; }
 
     public virtual Exam Exam { get; set; } = null!;
 

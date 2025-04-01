@@ -1,11 +1,12 @@
-﻿using System;
+﻿using E_LearningPlatform.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace E_LearningPlatform.Models;
 
-public partial class Exam
+public partial class Exam:ISharedProperties
 {
-    public int ExamId { get; set; }
+    public int Id { get; set; }
 
     public int CourseId { get; set; }
 
@@ -18,6 +19,8 @@ public partial class Exam
     public int ExamTime { get; set; }
 
     public int TotalPoints { get; set; }
+
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 

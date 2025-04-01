@@ -6,14 +6,9 @@ namespace E_LearningPlatform.Models;
 
 public partial class AppDBContext : DbContext
 {
-    public AppDBContext()
-    {
-    }
-
     public AppDBContext(DbContextOptions<AppDBContext> options)
         : base(options)
     {
-
     }
 
     public virtual DbSet<Answer> Answers { get; set; }
@@ -26,7 +21,15 @@ public partial class AppDBContext : DbContext
 
     public virtual DbSet<Question> Questions { get; set; }
 
+    public virtual DbSet<Student> Students { get; set; }
+
     public virtual DbSet<StudentExam> StudentExams { get; set; }
+
+    public virtual DbSet<StudentsCourse> StudentsCourses { get; set; }
+
+    public virtual DbSet<Teacher> Teachers { get; set; }
+
+    public virtual DbSet<TeachersCourse> TeachersCourses { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -34,9 +37,9 @@ public partial class AppDBContext : DbContext
     {
         modelBuilder.Entity<Answer>(entity =>
         {
-            entity.HasKey(e => e.ResultId).HasName("PK_Awnsers");
+            entity.HasKey(e => e.Id).HasName("PK_Awnsers");
 
-            entity.Property(e => e.ResultId).HasColumnName("ResultID");
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.ExamId).HasColumnName("ExamID");
             entity.Property(e => e.QuestionId).HasColumnName("QuestionID");
             entity.Property(e => e.StudentAwnser)
@@ -63,7 +66,7 @@ public partial class AppDBContext : DbContext
 
         modelBuilder.Entity<Course>(entity =>
         {
-            entity.Property(e => e.CourseId).HasColumnName("CourseID");
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CourseName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -74,7 +77,7 @@ public partial class AppDBContext : DbContext
 
         modelBuilder.Entity<Exam>(entity =>
         {
-            entity.Property(e => e.ExamId).HasColumnName("ExamID");
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CourseId).HasColumnName("CourseID");
             entity.Property(e => e.Description)
                 .HasMaxLength(250)
@@ -115,7 +118,7 @@ public partial class AppDBContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.Property(e => e.QuestionId).HasColumnName("QuestionID");
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CourseId).HasColumnName("CourseID");
             entity.Property(e => e.QuestionAnswer)
                 .HasMaxLength(1)
@@ -129,6 +132,25 @@ public partial class AppDBContext : DbContext
                 .HasForeignKey(d => d.CourseId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Questions_Courses");
+        });
+
+        modelBuilder.Entity<Student>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("STUDENTS");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TeacherDegree)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.UserId).HasColumnName("UserID");
         });
 
         modelBuilder.Entity<StudentExam>(entity =>
@@ -151,13 +173,68 @@ public partial class AppDBContext : DbContext
                 .HasConstraintName("FK_StudentExams_Users");
         });
 
+        modelBuilder.Entity<StudentsCourse>(entity =>
+        {
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.CourseId).HasColumnName("CourseID");
+            entity.Property(e => e.StudentId).HasColumnName("StudentID");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.StudentsCourses)
+                .HasForeignKey(d => d.CourseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentsCourses_Courses");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.StudentsCourses)
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentsCourses_Users");
+        });
+
+        modelBuilder.Entity<Teacher>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("TEACHERS");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TeacherDegree)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+        });
+
+        modelBuilder.Entity<TeachersCourse>(entity =>
+        {
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("ID");
+            entity.Property(e => e.CourseId).HasColumnName("CourseID");
+            entity.Property(e => e.TeacherId).HasColumnName("TeacherID");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.TeachersCourses)
+                .HasForeignKey(d => d.CourseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeachersCourses_Courses");
+
+            entity.HasOne(d => d.Teacher).WithMany(p => p.TeachersCourses)
+                .HasForeignKey(d => d.TeacherId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeachersCourses_Users");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasIndex(e => e.Email, "UQ_Email").IsUnique();
 
-            entity.Property(e => e.UserId)
+            entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("UserID");
+                .HasColumnName("ID");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using E_LearningPlatform.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace E_LearningPlatform.Models;
 
-public partial class User
+public partial class User:ISharedProperties
 {
-    public int UserId { get; set; }
+    public int Id { get; set; }
 
     public string Email { get; set; } = null!;
 
@@ -21,9 +22,15 @@ public partial class User
 
     public bool IsActive { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
     public virtual ICollection<Exam> Exams { get; set; } = new List<Exam>();
 
     public virtual ICollection<StudentExam> StudentExams { get; set; } = new List<StudentExam>();
+
+    public virtual ICollection<StudentsCourse> StudentsCourses { get; set; } = new List<StudentsCourse>();
+
+    public virtual ICollection<TeachersCourse> TeachersCourses { get; set; } = new List<TeachersCourse>();
 }

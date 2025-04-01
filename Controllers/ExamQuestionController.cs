@@ -18,56 +18,56 @@ namespace E_LearningPlatform.Controllers
             _repository = repository;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<ExamsQuestion>> GetExamsQuestions()
-        {
-            return Ok(_repository.GetAll());
-        }
+        //[HttpGet]
+        //public ActionResult<IEnumerable<ExamsQuestion>> GetExamsQuestions()
+        //{
+        //    return Ok(_repository.GetAll());
+        //}
 
-        [HttpGet("{id}")]
-        public ActionResult<ExamsQuestion> GetExamsQuestion(int id)
-        {
-            var examsQuestion = _repository.Find(eq => eq.Id == id);
-            if (examsQuestion == null)
-            {
-                return NotFound();
-            }
-            return Ok(examsQuestion);
-        }
+        //[HttpGet("{id}")]
+        //public ActionResult<ExamsQuestion> GetExamsQuestion(int id)
+        //{
+        //    var examsQuestion = _repository.Find(eq => eq.Id == id);
+        //    if (examsQuestion == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(examsQuestion);
+        //}
 
-        [HttpPost]
-        public ActionResult<ExamsQuestion> PostExamsQuestion(ExamsQuestion examsQuestion)
-        {
-            _repository.Add(examsQuestion);
-            _repository.SaveChanges();
-            return CreatedAtAction(nameof(GetExamsQuestion), new { id = examsQuestion.Id }, examsQuestion);
-        }
+        //[HttpPost]
+        //public ActionResult<ExamsQuestion> PostExamsQuestion(ExamsQuestion examsQuestion)
+        //{
+        //    _repository.Add(examsQuestion);
+        //    _repository.SaveChanges();
+        //    return CreatedAtAction(nameof(GetExamsQuestion), new { id = examsQuestion.Id }, examsQuestion);
+        //}
 
-        [HttpPut("{id}")]
-        public IActionResult PutExamsQuestion(int id, ExamsQuestion examsQuestion)
-        {
-            if (id != examsQuestion.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public IActionResult PutExamsQuestion(int id, ExamsQuestion examsQuestion)
+        //{
+        //    if (id != examsQuestion.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _repository.Update(examsQuestion);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Update(examsQuestion);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteExamsQuestion(int id)
-        {
-            var examsQuestion = _repository.Find(eq => eq.Id == id);
-            if (examsQuestion == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteExamsQuestion(int id)
+        //{
+        //    var examsQuestion = _repository.Find(eq => eq.Id == id);
+        //    if (examsQuestion == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _repository.Delete(examsQuestion);
-            _repository.SaveChanges();
-            return NoContent();
-        }
+        //    _repository.Delete(examsQuestion);
+        //    _repository.SaveChanges();
+        //    return NoContent();
+        //}
     }
 }

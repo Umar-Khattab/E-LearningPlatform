@@ -1,17 +1,20 @@
-﻿using System;
+﻿using E_LearningPlatform.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace E_LearningPlatform.Models;
 
-public partial class Question
+public partial class Question : ISharedProperties
 {
-    public int QuestionId { get; set; }
+    public int Id { get; set; }
 
     public int CourseId { get; set; }
 
     public string QuestionInfo { get; set; } = null!;
 
     public string QuestionAnswer { get; set; } = null!;
+
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
