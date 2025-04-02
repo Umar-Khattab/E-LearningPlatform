@@ -12,7 +12,7 @@ public partial class Answer:ISharedProperties
 
     public int StudentId { get; set; }
 
-    public string StudentAwnser { get; set; } = null!;
+    public string StudentAnswer { get; set; } = null!;
 
     public int ExamId { get; set; }
 

@@ -42,7 +42,7 @@ public partial class AppDBContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.ExamId).HasColumnName("ExamID");
             entity.Property(e => e.QuestionId).HasColumnName("QuestionID");
-            entity.Property(e => e.StudentAwnser)
+            entity.Property(e => e.StudentAnswer)
                 .HasMaxLength(1)
                 .IsUnicode(false)
                 .IsFixedLength();

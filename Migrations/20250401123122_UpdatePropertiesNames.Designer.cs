@@ -42,7 +42,7 @@ namespace E_LearningPlatform.Migrations
                         .HasColumnType("int")
                         .HasColumnName("QuestionID");
 
-                    b.Property<string>("StudentAwnser")
+                    b.Property<string>("StudentAnswer")
                         .IsRequired()
                         .HasMaxLength(1)
                         .IsUnicode(false)
