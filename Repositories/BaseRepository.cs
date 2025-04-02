@@ -106,17 +106,17 @@ namespace E_LearningPlatform.Repositories
         /// <returns>The entity that matches the predicate.</returns>
         /// <exception cref="NotFoundException">Thrown when no entity is found that matches the predicate.</exception>
         /// <exception cref="RepositoryException">Thrown when an error occurs while finding the entity.</exception>
-        public T Find(Expression<Func<T, bool>> predicate)
+        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate)
         {
             try
             {
                 _logger.LogInformation($"Finding {typeof(T).Name} by predicate");
-                var entity = _dbSet.FirstOrDefault(predicate);
+                var entity = await _dbSet.FirstOrDefaultAsync(predicate);
 
                 if (entity == null)
                     throw new NotFoundException($"{typeof(T).Name} not found");
 
-                return entity;
+                return await Task.FromResult(entity);
             }
             catch (NotFoundException)
             {

@@ -12,7 +12,7 @@ namespace E_LearningPlatform.Interfaces
         T Add(T entity);
         Task<T> AddAsync(T entity);
         void Delete(T entity);
-        T Find(Expression<Func<T, bool>> predicate);
+        Task<T> FindAsync(Expression<Func<T, bool>> predicate);
         IEnumerable<T> GetAll();
         T Update(T entity);
         int Count();
