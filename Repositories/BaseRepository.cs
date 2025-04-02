@@ -12,6 +12,7 @@ namespace E_LearningPlatform.Repositories
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         private readonly AppDBContext _context;
+        private readonly DbSet<T> _dbSet;
         private readonly ILogger<BaseRepository<T>> _logger;
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace E_LearningPlatform.Repositories
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dbSet = _context.Set<T>() ?? throw new AbandonedMutexException("Failed to get DbSet for entity");
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace E_LearningPlatform.Repositories
                     throw new ArgumentNullException(nameof(entity));
 
                 _logger.LogInformation($"Adding new {typeof(T).Name}");
-                _context.Set<T>().Add(entity);
+                _dbSet.Add(entity);
                 return entity;
             }
             catch (Exception ex)
@@ -50,7 +52,29 @@ namespace E_LearningPlatform.Repositories
                 throw new RepositoryException($"Error adding {typeof(T).Name}", ex);
             }
         }
-
+        /// <summary>
+        /// Adds a new entity to the database asynchronously.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>Entity will be added</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="RepositoryException"></exception>
+        public async Task<T> AddAsync(T entity)
+        {
+            try
+            {
+                if (entity == null)
+                    throw new ArgumentNullException(nameof(entity));
+                _logger.LogInformation($"Adding new {typeof(T).Name}");
+                await _dbSet.AddAsync(entity);
+                return await Task.FromResult(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error adding {typeof(T).Name}");
+                throw new RepositoryException($"Error adding {typeof(T).Name}", ex);
+            }
+        }
         /// <summary>
         /// Deletes an entity from the database.
         /// </summary>
@@ -65,7 +89,7 @@ namespace E_LearningPlatform.Repositories
                     throw new ArgumentNullException(nameof(entity));
 
                 _logger.LogInformation($"Deleting {typeof(T).Name}");
-                _context.Set<T>().Remove(entity);
+                _dbSet.Remove(entity);
             }
             catch (Exception ex)
             {
@@ -77,6 +101,7 @@ namespace E_LearningPlatform.Repositories
         /// <summary>
         /// Finds an entity that matches the specified predicate.
         /// </summary>
+        /// <remarks>Warning : Predicate parameter must be Unique like (gmail,ID...etc)!!</remarks>
         /// <param name="predicate">The predicate to match.</param>
         /// <returns>The entity that matches the predicate.</returns>
         /// <exception cref="NotFoundException">Thrown when no entity is found that matches the predicate.</exception>
@@ -86,7 +111,7 @@ namespace E_LearningPlatform.Repositories
             try
             {
                 _logger.LogInformation($"Finding {typeof(T).Name} by predicate");
-                var entity = _context.Set<T>().FirstOrDefault(predicate);
+                var entity = _dbSet.FirstOrDefault(predicate);
 
                 if (entity == null)
                     throw new NotFoundException($"{typeof(T).Name} not found");
@@ -114,7 +139,7 @@ namespace E_LearningPlatform.Repositories
             try
             {
                 _logger.LogInformation($"Getting all {typeof(T).Name} entities");
-                return _context.Set<T>().AsNoTracking().ToList();
+                return _dbSet.AsNoTracking().ToList();
             }
             catch (Exception ex)
             {
@@ -138,7 +163,7 @@ namespace E_LearningPlatform.Repositories
                     throw new ArgumentNullException(nameof(entity));
 
                 _logger.LogInformation($"Updating {typeof(T).Name}");
-                _context.Update(entity);
+                _dbSet.Update(entity);
                 return entity;
             }
             catch (Exception ex)
@@ -157,7 +182,7 @@ namespace E_LearningPlatform.Repositories
         {
             try
             {
-                return _context.Set<T>().Count();
+                return _dbSet.Count();
             }
             catch (Exception ex)
             {
@@ -172,11 +197,11 @@ namespace E_LearningPlatform.Repositories
         /// <param name="criteria">The criteria to match.</param>
         /// <returns>The count of entities that match the criteria.</returns>
         /// <exception cref="RepositoryException">Thrown when an error occurs while counting the entities.</exception>
-        public int Count(Expression<Func<T, bool>> criteria)
+        public async Task<int> CountSpecificAsync(Expression<Func<T, bool>> criteria)
         {
             try
             {
-                return _context.Set<T>().Count(criteria);
+                return await _dbSet.CountAsync(criteria);
             }
             catch (Exception ex)
             {
@@ -186,7 +211,7 @@ namespace E_LearningPlatform.Repositories
         }
 
         /// <summary>
-        /// Finds all entities that match the specified criteria, with optional pagination.
+        /// Finds all entities Async that match the specified criteria, with optional pagination.
         /// </summary>
         /// <param name="criteria">The criteria to match.</param>
         /// <param name="skip">The number of entities to skip.</param>
@@ -197,7 +222,7 @@ namespace E_LearningPlatform.Repositories
         {
             try
             {
-                IQueryable<T> query = _context.Set<T>().Where(criteria);
+                IQueryable<T> query = _dbSet.Where(criteria);
 
                 if (skip.HasValue)
                     query = query.Skip(skip.Value);
@@ -213,54 +238,48 @@ namespace E_LearningPlatform.Repositories
                 throw new RepositoryException($"Error finding {typeof(T).Name} entities", ex);
             }
         }
-
-        /// <summary>
-        /// Saves the changes made to the context.
-        /// </summary>
-        /// <returns>The number of state entries written to the database.</returns>
-        /// <exception cref="RepositoryException">Thrown when an error occurs while saving changes.</exception>
-        public int SaveChanges()
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take)
         {
             try
             {
-                return _context.SaveChanges();
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error occurred");
-                throw new RepositoryException("Error saving changes to database", ex);
+                IQueryable<T> query = await Task.FromResult(_dbSet.Where(criteria));
+                if (skip.HasValue)
+                    query = query.Skip(skip.Value);
+                if (take.HasValue)
+                    query = query.Take(take.Value);
+                return await Task.FromResult(query.AsNoTracking().ToList());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving changes");
-                throw new RepositoryException("Error saving changes", ex);
+                _logger.LogError(ex, $"Error finding {typeof(T).Name} entities with criteria");
+                throw new RepositoryException($"Error finding {typeof(T).Name} entities", ex);
             }
         }
-    }
 
-    /// <summary>
-    /// Represents errors that occur during repository operations.
-    /// </summary>
-    public class RepositoryException : Exception
-    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RepositoryException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception.
+        /// Represents errors that occur during repository operations.
         /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
-        public RepositoryException(string message, Exception innerException = null)
-            : base(message, innerException) { }
-    }
+        public class RepositoryException : Exception
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RepositoryException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception.
+            /// </summary>
+            /// <param name="message">The error message that explains the reason for the exception.</param>
+            /// <param name="innerException">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
+            public RepositoryException(string message, Exception innerException = null)
+                : base(message, innerException) { }
+        }
 
-    /// <summary>
-    /// Represents errors that occur when an entity is not found.
-    /// </summary>
-    public class NotFoundException : Exception
-    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotFoundException"/> class with a specified error message.
+        /// Represents errors that occur when an entity is not found.
         /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        public NotFoundException(string message) : base(message) { }
+        public class NotFoundException : Exception
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="NotFoundException"/> class with a specified error message.
+            /// </summary>
+            /// <param name="message">The error message that explains the reason for the exception.</param>
+            public NotFoundException(string message) : base(message) { }
+        }
     }
 }

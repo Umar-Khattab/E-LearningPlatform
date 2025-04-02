@@ -9,14 +9,15 @@ namespace E_LearningPlatform.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
-        IEnumerable<T> GetAll();
-        T Find(Expression<Func<T, bool>> predicate);
         T Add(T entity);
-        T Update(T entity);
+        Task<T> AddAsync(T entity);
         void Delete(T entity);
+        T Find(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> GetAll();
+        T Update(T entity);
         int Count();
-        int Count(Expression<Func<T, bool>> predicate);
+        Task<int> CountSpecificAsync(Expression<Func<T, bool>> predicate);
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip);
-        int SaveChanges();
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? take, int? skip);
     }
 }
